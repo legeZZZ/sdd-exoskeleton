@@ -60,5 +60,5 @@ export function diffState(
     }
   }
 
-  return { added, modified, removed };
+  return { added: added.sort(), modified: modified.sort(), removed: removed.sort() };
 }

@@ -103,6 +103,15 @@ describe("loadConfig", () => {
     expect(loaded.codegraph.mcpPort).toBe(5000);
     expect(loaded.codegraph.indexPath).toBe(".codegraph"); // from default
   });
+
+  it("mutating returned config does NOT mutate DEFAULT_CONFIG", () => {
+    const config = loadConfig(tmpDir);
+    config.version = "hacked-version";
+    config.project.name = "hacked-project";
+
+    expect(DEFAULT_CONFIG.version).toBe("0.1.0");
+    expect(DEFAULT_CONFIG.project.name).toBe("");
+  });
 });
 
 describe("saveConfig", () => {
@@ -153,14 +162,14 @@ describe("saveConfig", () => {
     const dir = path.join(tmpDir, ".sdd-exoskeleton");
     expect(fs.existsSync(dir)).toBe(false);
 
-    saveConfig(tmpDir, DEFAULT_CONFIG as SddConfig);
+    saveConfig(tmpDir, DEFAULT_CONFIG);
 
     expect(fs.existsSync(dir)).toBe(true);
     expect(fs.existsSync(path.join(dir, "config.json"))).toBe(true);
   });
 
   it("writes formatted JSON", () => {
-    saveConfig(tmpDir, DEFAULT_CONFIG as SddConfig);
+    saveConfig(tmpDir, DEFAULT_CONFIG);
     const raw = fs.readFileSync(
       path.join(tmpDir, ".sdd-exoskeleton", "config.json"),
       "utf-8",

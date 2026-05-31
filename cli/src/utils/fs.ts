@@ -20,7 +20,3 @@ export function safeRead(filePath: string): string | null {
     throw err;
   }
 }
-
-export function exists(filePath: string): boolean {
-  return fs.existsSync(filePath);
-}

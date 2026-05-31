@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { safeRead, safeWrite, mkdirp } from "./utils/fs.js";
+import { safeRead, safeWrite } from "./utils/fs.js";
 
 export interface SddConfig {
   version: string;
@@ -10,8 +10,9 @@ export interface SddConfig {
   sync: { mode: "manual" | "git-hook" | "watch"; lastSyncRef: string; lastSyncAt: string };
 }
 
-export const DEFAULT_CONFIG: Partial<SddConfig> = {
+export const DEFAULT_CONFIG: SddConfig = {
   version: "0.1.0",
+  project: { name: "", languages: [], rootDir: "", srcDir: "" },
   codegraph: { indexPath: ".codegraph", mcpPort: 0 },
   openspec: { path: "openspec", changeDir: "openspec/changes" },
   obsidian: { vaultPath: "sdd-vault", strategy: "hybrid" },
@@ -47,7 +48,7 @@ export function loadConfig(rootDir: string): SddConfig {
   const raw = safeRead(configPath);
 
   if (raw === null) {
-    return DEFAULT_CONFIG as SddConfig;
+    return structuredClone(DEFAULT_CONFIG);
   }
 
   let parsed: Record<string, unknown>;
@@ -57,13 +58,11 @@ export function loadConfig(rootDir: string): SddConfig {
     throw new Error(`Invalid JSON in config file: ${configPath}`);
   }
 
-  return deepMerge(DEFAULT_CONFIG as Record<string, unknown>, parsed) as unknown as SddConfig;
+  return deepMerge(structuredClone(DEFAULT_CONFIG) as unknown as Record<string, unknown>, parsed) as unknown as SddConfig;
 }
 
 export function saveConfig(rootDir: string, config: SddConfig): void {
-  const dirPath = path.join(rootDir, ".sdd-exoskeleton");
-  mkdirp(dirPath);
-  const configPath = path.join(dirPath, "config.json");
+  const configPath = path.join(rootDir, ".sdd-exoskeleton", "config.json");
   safeWrite(configPath, JSON.stringify(config, null, 2));
 }
 
