@@ -1,0 +1,26 @@
+{
+  "name": "sdd-exoskeleton",
+  "version": "0.1.0",
+  "description": "SDD exoskeleton for legacy projects — CodeGraph + OpenSpec + Obsidian",
+  "bin": { "sdd": "./bin/sdd" },
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "commander": "^12",
+    "simple-git": "^3",
+    "chokidar": "^3",
+    "chalk": "^5"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "tsx": "^4",
+    "vitest": "^1",
+    "@types/node": "^20"
+  }
+}
