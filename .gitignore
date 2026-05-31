@@ -1,2 +1,8 @@
 node_modules/
 dist/
+*.tsbuildinfo
+.sdd-exoskeleton/
+.codegraph/
+sdd-vault/
+openspec/changes/*/
+!openspec/changes/archive/

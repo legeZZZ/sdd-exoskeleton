@@ -76,7 +76,13 @@ function extractModule(filePath: string): string {
   const parts = filePath.split("/");
   const srcIndex = parts.indexOf("src");
   if (srcIndex >= 0 && srcIndex < parts.length - 1) {
-    return parts[srcIndex + 1];
+    const raw = parts[srcIndex + 1];
+    // Strip file extension so "index.ts" → "index"
+    const dotIdx = raw.lastIndexOf(".");
+    if (dotIdx > 0 && raw.length - dotIdx <= 5) {
+      return raw.substring(0, dotIdx);
+    }
+    return raw;
   }
   return parts.length > 1 ? parts[0] : "";
 }

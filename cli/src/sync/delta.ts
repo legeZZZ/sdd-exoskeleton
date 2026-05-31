@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import * as fs from "node:fs";
 import type { ImpactReport } from "./impact.js";
 import type { SymbolChange } from "./detector.js";
 import type { SyncState } from "../sync-state.js";
@@ -27,6 +28,7 @@ function fileNameToSymbol(filePath: string): string {
 /**
  * Infer the source file path for a given SymbolChange by searching
  * `src/<module>/` for a file whose name maps to the change's symbol name.
+ * Also handles the case where `src/<module>` is itself a file (e.g. `src/index`).
  * Returns null if no matching file is found.
  */
 function inferFilePath(
@@ -36,28 +38,45 @@ function inferFilePath(
   const module = change.module;
   if (!module) return null;
 
-  const moduleDir = path.join(projectDir, "src", module);
-  const entries = listDir(moduleDir);
-  if (entries.length === 0) return null;
+  const modulePath = path.join(projectDir, "src", module);
 
-  const lowerName = change.name.toLowerCase();
-  const extensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
-
-  // Try direct lowercase match with common extensions
-  for (const ext of extensions) {
-    const candidate = `${lowerName}${ext}`;
-    if (entries.includes(candidate)) {
-      return path.join(moduleDir, candidate);
-    }
+  // Check what kind of filesystem entry src/<module> is
+  let stats: fs.Stats;
+  try {
+    stats = fs.statSync(modulePath);
+  } catch {
+    return null;
   }
 
-  // Fall back to symbol-name matching for kebab-case / snake_case filenames
-  for (const entry of entries) {
-    const ext = path.extname(entry);
-    if (!extensions.includes(ext)) continue;
-    const symbolFromFile = fileNameToSymbol(entry);
-    if (symbolFromFile === change.name) {
-      return path.join(moduleDir, entry);
+  // Case 1: src/<module> is directly a file (e.g. src/index)
+  if (stats.isFile()) {
+    return modulePath;
+  }
+
+  // Case 2: src/<module> is a directory (e.g. src/auth)
+  if (stats.isDirectory()) {
+    const entries = listDir(modulePath);
+    if (entries.length === 0) return null;
+
+    const lowerName = change.name.toLowerCase();
+    const extensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
+
+    // Try direct lowercase match with common extensions
+    for (const ext of extensions) {
+      const candidate = `${lowerName}${ext}`;
+      if (entries.includes(candidate)) {
+        return path.join(modulePath, candidate);
+      }
+    }
+
+    // Fall back to symbol-name matching for kebab-case / snake_case filenames
+    for (const entry of entries) {
+      const ext = path.extname(entry);
+      if (!extensions.includes(ext)) continue;
+      const symbolFromFile = fileNameToSymbol(entry);
+      if (symbolFromFile === change.name) {
+        return path.join(modulePath, entry);
+      }
     }
   }
 
