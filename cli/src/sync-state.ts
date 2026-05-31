@@ -12,8 +12,6 @@ export interface SyncState {
   entries: Record<string, SyncEntry>;
 }
 
-const EMPTY_STATE: SyncState = { entries: {} };
-
 export function loadSyncState(rootDir: string): SyncState {
   const statePath = path.join(rootDir, ".sdd-exoskeleton", "sync-state.json");
   const raw = safeRead(statePath);
