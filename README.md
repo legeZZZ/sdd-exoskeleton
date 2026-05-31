@@ -13,15 +13,13 @@
 
 百万行历史代码库缺少让 AI 理解的"消化系统"——代码结构、数据流、方法链路不可见，导致需求落地偏差。sdd-exoskeleton 让老项目零成本接入 SDD 工作流。
 
-**与 vibe-coding-cn 的核心差异：棕地优先** — 无需从零开始，无需重构，一键分析现有项目。
-
 ## 核心工具链
 
 | 工具 | 角色 |
 |------|------|
 | **[CodeGraph](https://github.com/colbymchenry/codegraph)** | 代码知识图谱引擎 — 19+ 语言，SQLite 索引 |
 | **[OpenSpec](https://github.com/Fission-AI/OpenSpec)** | SDD 流程控制 — 规范定义、变更管理、归档 |
-| **Obsidian** | 知识沉淀 — 模块笔记、API 文档、ADR 决策记录 |
+| **Obsidian** | 知识图谱 — 模块笔记、API 文档、ADR 决策记录 |
 | **Claude Code / OpenCode** | AI 编码执行层 — 读规范→写代码 |
 
 ## 快速开始
